@@ -32,7 +32,11 @@ module FactoryGirl
       end
       names = ActiveRecord::Base.descendants.collect(&:table_name).uniq if names.empty?
       ActiveRecord::Base.connection.disable_referential_integrity do
-        names.each {|table| ActiveRecord::Base.connection.execute(query % ActiveRecord::Base.connection.quote_table_name(table))}
+        names.each do |table|
+          if ActiveRecord::Base.connection.table_exists?(table)
+            ActiveRecord::Base.connection.execute(query % ActiveRecord::Base.connection.quote_table_name(table))
+          end
+        end
       end
     end
 
